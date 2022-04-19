@@ -146,14 +146,13 @@ type remoteSubnetInfo struct {
 const NETWORK_TYPE_OVERLAY = "overlay"
 
 func newHostNetworkService() (HostNetworkService, hcn.SupportedFeatures) {
-	var hns HostNetworkService
-	hns = hnsV1{}
+	var h HostNetworkService
 	supportedFeatures := hcn.GetSupportedFeatures()
 	if supportedFeatures.Api.V2 {
-		hns = hnsV2{}
+		h = hns{}
 	}
 
-	return hns, supportedFeatures
+	return h, supportedFeatures
 }
 
 func getNetworkName(hnsNetworkName string) (string, error) {
@@ -234,6 +233,7 @@ type endpointsInfo struct {
 	refCount        *uint16
 	providerAddress string
 	hns             HostNetworkService
+	name            string
 
 	// conditions
 	ready       bool

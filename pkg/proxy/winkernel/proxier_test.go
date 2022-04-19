@@ -78,6 +78,7 @@ func (hns fakeHNS) getEndpointByID(id string) (*endpointsInfo, error) {
 }
 
 func (hns fakeHNS) getEndpointByName(name string) (*endpointsInfo, error) {
+	fmt.Println("this is ran")
 	return &endpointsInfo{
 		isLocal:    true,
 		macAddress: macAddress,
@@ -783,8 +784,6 @@ func TestCreateDsrLoadBalancer(t *testing.T) {
 		}
 		if len(svcInfo.loadBalancerIngressIPs) == 0 {
 			t.Errorf("svcInfo does not have any loadBalancerIngressIPs, %+v", svcInfo)
-		} else if svcInfo.loadBalancerIngressIPs[0].healthCheckHnsID != guid {
-			t.Errorf("The Hns Loadbalancer HealthCheck Id %v does not match %v. ServicePortName %q", svcInfo.loadBalancerIngressIPs[0].healthCheckHnsID, guid, svcPortName.String())
 		}
 	}
 }
