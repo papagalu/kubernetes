@@ -29,6 +29,17 @@ import (
 	"strings"
 )
 
+type HostNetworkService interface {
+	getNetworkByName(name string) (*hnsNetworkInfo, error)
+	getEndpointByID(id string) (*endpointsInfo, error)
+	getEndpointByIpAddress(ip string, networkName string) (*endpointsInfo, error)
+	getEndpointByName(id string) (*endpointsInfo, error)
+	createEndpoint(ep *endpointsInfo, networkName string) (*endpointsInfo, error)
+	deleteEndpoint(hnsID string) error
+	getLoadBalancer(endpoints []endpointsInfo, flags loadBalancerFlags, sourceVip string, vip string, protocol uint16, internalPort uint16, externalPort uint16) (*loadBalancerInfo, error)
+	deleteLoadBalancer(hnsID string) error
+}
+
 type hnsV2 struct{}
 
 var (

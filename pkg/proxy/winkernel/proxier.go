@@ -139,11 +139,11 @@ const NETWORK_TYPE_OVERLAY = "overlay"
 
 func newHostNetworkService() (HostNetworkService, hcn.SupportedFeatures) {
 	var hns HostNetworkService
-	hns = hnsV1{}
 	supportedFeatures := hcn.GetSupportedFeatures()
 	if supportedFeatures.Api.V2 {
 		hns = hnsV2{}
 	}
+	//TODO what should be the default behaviour if fail?
 
 	return hns, supportedFeatures
 }
