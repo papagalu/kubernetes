@@ -378,6 +378,16 @@ func TestGetLoadBalancerExisting(t *testing.T) {
 		t.Errorf("%v does not match %v", lb.hnsID, LoadBalancer.Id)
 	}
 
+	loadbalancer, err := hcn.GetLoadBalancerByID(lb.hnsID)
+
+	t.Logf("Load balancer 1 is %#v\n", LoadBalancer)
+	t.Logf("Load balancer 2 is %#v", loadbalancer)
+
+	diff := assertHCNDiff(*LoadBalancer, *loadbalancer)
+	if diff != "" {
+		t.Errorf("getLoadBalancerByID(%s) returned a different endpoint. Diff: %s ", loadbalancer.Id, diff)
+	}
+
 	err = LoadBalancer.Delete()
 	if err != nil {
 		t.Error(err)
