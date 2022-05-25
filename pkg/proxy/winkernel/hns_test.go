@@ -58,6 +58,10 @@ func assertHCNDiff(x, y interface{}) string {
 		nx := x.(hcn.HostComputeLoadBalancer)
 		ny := y.(hcn.HostComputeLoadBalancer)
 		nx.Id = ny.Id
+	case hcn.HostComputeNetwork:
+		nx := x.(hcn.HostComputeNetwork)
+		ny := y.(hcn.HostComputeNetwork)
+		nx.Id = ny.Id
 	}
 
 	diff := cmp.Diff(nx, ny)
@@ -76,6 +80,17 @@ func TestGetNetworkByName(t *testing.T) {
 	if !strings.EqualFold(network.id, Network.Id) {
 		t.Errorf("%v does not match %v", network.id, Network.Id)
 	}
+
+	HCNNetwork, err := hcn.GetNetworkByName(Network.Name)
+	if err != nil {
+		t.Error(err)
+	}
+
+	diff := assertHCNDiff(*HCNNetwork, *Network)
+	if diff != "" {
+		t.Errorf("getEndpointByID(%s) returned a different endpoint. Diff: %s ", HCNNetwork.Name, diff)
+	}
+
 	err = Network.Delete()
 	if err != nil {
 		t.Error(err)
