@@ -125,6 +125,16 @@ func TestGetEndpointByID(t *testing.T) {
 		t.Errorf("%v does not match %v", endpoint.hnsID, Endpoint.Id)
 	}
 
+	HCNEndpoint, err := hcn.GetEndpointByID(Endpoint.Id)
+	if err != nil {
+		t.Error(err)
+	}
+
+	diff := assertHCNDiff(*HCNEndpoint, *Endpoint)
+	if diff != "" {
+		t.Errorf("getEndpointByID(%s) returned a different endpoint. Diff: %s ", HCNEndpoint.Name, diff)
+	}
+
 	err = Endpoint.Delete()
 	if err != nil {
 		t.Error(err)
