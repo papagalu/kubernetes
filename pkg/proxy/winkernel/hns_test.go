@@ -231,6 +231,31 @@ func TestCreateEndpointRemote(t *testing.T) {
 	Network := mustTestNetwork(t)
 	providerAddress := epPaAddress
 
+	expectedEndpoint := &hcn.HostComputeEndpoint{
+		IpConfigurations: []hcn.IpConfig{{IpAddress: epIpAddressRemote, PrefixLength: 24}},
+		MacAddress:       epMacAddress,
+		Policies: []hcn.EndpointPolicy{
+			{
+				Type:     "ProviderAddress",
+				Settings: json.RawMessage("{\"ProviderAddress\":50}"),
+			},
+			{
+				Type:     "EncapOverhead",
+				Settings: json.RawMessage("{\"Overhead\":50}"),
+			},
+		},
+		SchemaVersion: hcn.Version{
+			Major: 2,
+			Minor: 0,
+		},
+		Health: hcn.Health{
+			Extra: hcn.ExtraParams{
+				SharedContainers: json.RawMessage("[]"),
+			},
+		},
+		Flags: hcn.EndpointFlagsRemoteEndpoint,
+	}
+
 	endpoint := &endpointsInfo{
 		ip:              epIpAddressRemote,
 		macAddress:      epMacAddress,
@@ -246,15 +271,12 @@ func TestCreateEndpointRemote(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if !strings.EqualFold(endpoint.hnsID, Endpoint.Id) {
-		t.Errorf("%v does not match %v", endpoint.hnsID, Endpoint.Id)
+
+	diff := assertHCNDiff(*expectedEndpoint, *Endpoint)
+	if diff != "" {
+		t.Errorf("getEndpointByID(%s) returned a different endpoint. Diff: %s ", Endpoint.Name, diff)
 	}
-	if endpoint.ip != Endpoint.IpConfigurations[0].IpAddress {
-		t.Errorf("%v does not match %v", endpoint.ip, Endpoint.IpConfigurations[0].IpAddress)
-	}
-	if endpoint.macAddress != Endpoint.MacAddress {
-		t.Errorf("%v does not match %v", endpoint.macAddress, Endpoint.MacAddress)
-	}
+
 	if len(providerAddress) != 0 && endpoint.providerAddress != epPaAddress {
 		t.Errorf("%v does not match %v", endpoint.providerAddress, providerAddress)
 	}
