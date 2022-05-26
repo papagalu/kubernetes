@@ -183,12 +183,16 @@ func TestGetEndpointByIpAddressAndName(t *testing.T) {
 	if !strings.EqualFold(endpoint.name, Endpoint.Name) {
 		t.Errorf("%v does not match %v", endpoint.hnsID, Endpoint.Id)
 	}
-	//diff := cmp.Diff(endpoint, Endpoint)
-	//fmt.Printf("endpoint is %v\n", endpoint)
-	//fmt.Printf("Endpoint is %v\n", Endpoint)
-	//if diff != "" {
-	//	t.Errorf("getEndpointByName(%s) returned a different endpoint. Diff: %s ", Endpoint.Name, diff)
-	//}
+
+	HCNEndpoint, err := hcn.GetEndpointByName(Endpoint.Name)
+	if err != nil {
+		t.Error(err)
+	}
+
+	diff := assertHCNDiff(*HCNEndpoint, *Endpoint)
+	if diff != "" {
+		t.Errorf("getEndpointByID(%s) returned a different endpoint. Diff: %s ", HCNEndpoint.Name, diff)
+	}
 
 	err = Endpoint.Delete()
 	if err != nil {
@@ -460,6 +464,7 @@ func TestGetLoadBalancerNew(t *testing.T) {
 	if !strings.EqualFold(lb.hnsID, LoadBalancer.Id) {
 		t.Errorf("%v does not match %v", lb.hnsID, LoadBalancer.Id)
 	}
+
 	err = LoadBalancer.Delete()
 	if err != nil {
 		t.Error(err)
