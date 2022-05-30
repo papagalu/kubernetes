@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Microsoft/hcsshim/hcn"
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -717,6 +718,25 @@ func TestCreateLoadBalancer(t *testing.T) {
 			t.Errorf("%v does not match %v", svcInfo.hnsID, guid)
 		}
 	}
+
+	// LoadBalancer1, err := hcn.GetLoadBalancerByID(guid)
+
+	// if err != nil {
+	// 	t.Error(err)
+	// }
+
+	LoadBalancer2, err := hcn.GetLoadBalancerByID(svcInfo.hnsID)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Logf("\nLB is %#v\n %#v", LoadBalancer2, svcInfo)
+
+	// diff := assertHCNDiff(*LoadBalancer1, *LoadBalancer2)
+	// if diff != "" {
+	// 	t.Errorf("getLoadBalancerByID(%s) returned a different LoadBalancer. Diff: %s ", LoadBalancer2.Id, diff)
+	// }
 }
 
 func TestCreateDsrLoadBalancer(t *testing.T) {
@@ -786,6 +806,23 @@ func TestCreateDsrLoadBalancer(t *testing.T) {
 			t.Errorf("svcInfo does not have any loadBalancerIngressIPs, %+v", svcInfo)
 		}
 	}
+
+	// LoadBalancer1, err := hcn.GetLoadBalancerByID(guid)
+
+	// if err != nil {
+	// 	t.Error(err)
+	// }
+
+	// LoadBalancer2, err := hcn.GetLoadBalancerByID(svcInfo.hnsID)
+
+	// if err != nil {
+	// 	t.Error(err)
+	// }
+
+	// diff := assertHCNDiff(*LoadBalancer1, *LoadBalancer2)
+	// if diff != "" {
+	// 	t.Errorf("getLoadBalancerByID(%s) returned a different LoadBalancer. Diff: %s ", LoadBalancer2.Id, diff)
+	// }
 }
 
 func TestEndpointSlice(t *testing.T) {

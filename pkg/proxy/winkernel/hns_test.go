@@ -88,7 +88,7 @@ func TestGetNetworkByName(t *testing.T) {
 
 	diff := assertHCNDiff(*HCNNetwork, *Network)
 	if diff != "" {
-		t.Errorf("getEndpointByID(%s) returned a different endpoint. Diff: %s ", HCNNetwork.Name, diff)
+		t.Errorf("GetNetworkByName(%s) returned a different Network. Diff: %s ", HCNNetwork.Name, diff)
 	}
 
 	err = Network.Delete()
@@ -411,7 +411,7 @@ func TestGetLoadBalancerExisting(t *testing.T) {
 
 	diff := assertHCNDiff(*LoadBalancer, *loadbalancer)
 	if diff != "" {
-		t.Errorf("getLoadBalancerByID(%s) returned a different endpoint. Diff: %s ", loadbalancer.Id, diff)
+		t.Errorf("getLoadBalancerByID(%s) returned a different LoadBalancer. Diff: %s ", loadbalancer.Id, diff)
 	}
 
 	err = LoadBalancer.Delete()
