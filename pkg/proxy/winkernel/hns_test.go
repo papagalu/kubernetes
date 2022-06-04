@@ -41,6 +41,8 @@ const (
 	protocol          = 6
 	internalPort      = 80
 	externalPort      = 32440
+	policyConst       = "50"
+	isolationID       = 5000
 )
 
 func assertHCNDiff(x, y interface{}) string {
@@ -213,7 +215,7 @@ func TestCreateEndpointLocal(t *testing.T) {
 		Policies: []hcn.EndpointPolicy{
 			{
 				Type:     "EncapOverhead",
-				Settings: json.RawMessage("{\"Overhead\":50}"),
+				Settings: json.RawMessage("{\"Overhead\":" + policyConst + "}"),
 			},
 		},
 		SchemaVersion: hcn.Version{
@@ -266,11 +268,11 @@ func TestCreateEndpointRemote(t *testing.T) {
 		Policies: []hcn.EndpointPolicy{
 			{
 				Type:     "ProviderAddress",
-				Settings: json.RawMessage("{\"ProviderAddress\":50}"),
+				Settings: json.RawMessage("{\"ProviderAddress\":" + policyConst + "}"),
 			},
 			{
 				Type:     "EncapOverhead",
-				Settings: json.RawMessage("{\"Overhead\":50}"),
+				Settings: json.RawMessage("{\"Overhead\":" + policyConst + "}"),
 			},
 		},
 		SchemaVersion: hcn.Version{
@@ -577,7 +579,7 @@ func createTestNetwork() (*hcn.HostComputeNetwork, error) {
 	}
 
 	vsid := &hcn.VsidPolicySetting{
-		IsolationId: 5000,
+		IsolationId: isolationID,
 	}
 	vsidJson, err := json.Marshal(vsid)
 	if err != nil {
