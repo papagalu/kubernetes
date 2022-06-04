@@ -56,10 +56,12 @@ func assertHCNDiff(x, y interface{}) string {
 		nx.Name = ny.Name
 		nx.HostComputeNetwork = ny.HostComputeNetwork
 		nx.Health = ny.Health
+		nx.IpConfigurations = ny.IpConfigurations
 	case hcn.HostComputeLoadBalancer:
 		nx := x.(hcn.HostComputeLoadBalancer)
 		ny := y.(hcn.HostComputeLoadBalancer)
 		nx.Id = ny.Id
+		nx.HostComputeEndpoints = ny.HostComputeEndpoints
 	case hcn.HostComputeNetwork:
 		nx := x.(hcn.HostComputeNetwork)
 		ny := y.(hcn.HostComputeNetwork)

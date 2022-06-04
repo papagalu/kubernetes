@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-	"time"
 
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
@@ -130,7 +129,7 @@ func (hns fakeHNS) deleteLoadBalancer(hnsID string) error {
 	return nil
 }
 
-func NewFakeProxier(networkType string) *Proxier {
+func NewFakeProxier(hnsfake *fakeHNS, networkType string) *Proxier {
 	sourceVip := "192.168.1.2"
 	hnsNetworkInfo := &hnsNetworkInfo{
 		id:          strings.ToUpper(guid),
@@ -148,7 +147,7 @@ func NewFakeProxier(networkType string) *Proxier {
 		sourceVip:           sourceVip,
 		hostMac:             macAddress,
 		isDSR:               false,
-		hns:                 newFakeHNS(),
+		hns:                 hnsfake,
 		endPointsRefCount:   make(endPointsReferenceCountMap),
 	}
 
@@ -161,8 +160,8 @@ func NewFakeProxier(networkType string) *Proxier {
 }
 
 func TestCreateServiceVip(t *testing.T) {
-	//	syncPeriod := 30 * time.Second
-	proxier := NewFakeProxier(NETWORK_TYPE_OVERLAY)
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_OVERLAY)
 	if proxier == nil {
 		t.Error()
 	}
@@ -216,8 +215,8 @@ func TestCreateServiceVip(t *testing.T) {
 }
 
 func TestCreateRemoteEndpointOverlay(t *testing.T) {
-	syncPeriod := 30 * time.Second
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY)
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_OVERLAY)
 	if proxier == nil {
 		t.Error()
 	}
@@ -281,8 +280,8 @@ func TestCreateRemoteEndpointOverlay(t *testing.T) {
 }
 
 func TestCreateRemoteEndpointL2Bridge(t *testing.T) {
-	syncPeriod := 30 * time.Second
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), "L2Bridge")
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_L2BRIDGE)
 	if proxier == nil {
 		t.Error()
 	}
@@ -344,9 +343,9 @@ func TestCreateRemoteEndpointL2Bridge(t *testing.T) {
 	}
 }
 func TestSharedRemoteEndpointDelete(t *testing.T) {
-	syncPeriod := 30 * time.Second
 	tcpProtocol := v1.ProtocolTCP
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), "L2Bridge")
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_L2BRIDGE)
 	if proxier == nil {
 		t.Error()
 	}
@@ -487,8 +486,8 @@ func TestSharedRemoteEndpointDelete(t *testing.T) {
 	}
 }
 func TestSharedRemoteEndpointUpdate(t *testing.T) {
-	syncPeriod := 30 * time.Second
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), "L2Bridge")
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_L2BRIDGE)
 	if proxier == nil {
 		t.Error()
 	}
@@ -661,9 +660,9 @@ func TestSharedRemoteEndpointUpdate(t *testing.T) {
 	}
 }
 func TestCreateLoadBalancer(t *testing.T) {
-	syncPeriod := 30 * time.Second
 	tcpProtocol := v1.ProtocolTCP
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY)
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_L2BRIDGE)
 	if proxier == nil {
 		t.Error()
 	}
@@ -724,8 +723,8 @@ func TestCreateLoadBalancer(t *testing.T) {
 }
 
 func TestCreateDsrLoadBalancer(t *testing.T) {
-	syncPeriod := 30 * time.Second
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY)
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_OVERLAY)
 	if proxier == nil {
 		t.Error()
 	}
@@ -810,8 +809,8 @@ func TestCreateDsrLoadBalancer(t *testing.T) {
 }
 
 func TestEndpointSlice(t *testing.T) {
-	syncPeriod := 30 * time.Second
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY)
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_OVERLAY)
 	if proxier == nil {
 		t.Error()
 	}
@@ -883,8 +882,8 @@ func TestEndpointSlice(t *testing.T) {
 }
 
 func TestLoadBalancer(t *testing.T) {
-	syncPeriod := 30 * time.Second
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY)
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_OVERLAY)
 	if proxier == nil {
 		t.Error()
 	}
@@ -947,8 +946,8 @@ func TestLoadBalancer(t *testing.T) {
 }
 
 func TestOnlyLocalLoadBalancing(t *testing.T) {
-	syncPeriod := 30 * time.Second
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY)
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_OVERLAY)
 	if proxier == nil {
 		t.Error()
 	}
@@ -1021,8 +1020,8 @@ func TestOnlyLocalLoadBalancing(t *testing.T) {
 }
 
 func TestNodePort(t *testing.T) {
-	syncPeriod := 30 * time.Second
-	proxier := NewFakeProxier(syncPeriod, syncPeriod, clusterCIDR, "testhost", netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY)
+	testHNS := newFakeHNS()
+	proxier := NewFakeProxier(testHNS, NETWORK_TYPE_OVERLAY)
 	if proxier == nil {
 		t.Error()
 	}
