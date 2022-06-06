@@ -42,6 +42,18 @@ type HostNetworkService interface {
 	deleteLoadBalancer(hnsID string) error
 }
 
+type HCN interface {
+	getNetworkByName(networkName string) (*hcn.HostComputeNetwork, error)
+	listEndpointsOfNetwork(networkId string) ([]hcn.HostComputeEndpoint, error)
+	getEndpointByID(endpointId string) (*hcn.HostComputeEndpoint, error)
+	listEndpoints() ([]hcn.HostComputeEndpoint, error)
+	getEndpointByName(endpointName string) (*hcn.HostComputeEndpoint, error)
+	listLoadBalancers() ([]hcn.HostComputeLoadBalancer, error)
+	getLoadBalancerByID(loadBalancerId string) (*hcn.HostComputeLoadBalancer, error)
+}
+
+type hcnutils struct{}
+
 type hns struct{}
 
 var (
