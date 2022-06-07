@@ -80,6 +80,7 @@ func TestGetNetworkByName(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	t.Logf("Network is: %#v", network)
 
 	if !strings.EqualFold(network.id, Network.Id) {
 		t.Errorf("%v does not match %v", network.id, Network.Id)

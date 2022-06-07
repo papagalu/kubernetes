@@ -9,15 +9,15 @@ const (
 )
 
 type HCN interface {
-	getNetworkByName(networkName string) (*hcn.HostComputeNetwork, error)
-	listEndpointsOfNetwork(networkId string) ([]hcn.HostComputeEndpoint, error)
-	getEndpointByID(endpointId string) (*hcn.HostComputeEndpoint, error)
-	listEndpoints() ([]hcn.HostComputeEndpoint, error)
-	getEndpointByName(endpointName string) (*hcn.HostComputeEndpoint, error)
-	listLoadBalancers() ([]hcn.HostComputeLoadBalancer, error)
-	getLoadBalancerByID(loadBalancerId string) (*hcn.HostComputeLoadBalancer, error)
-	createEndpoint(endpoint *hcn.HostComputeEndpoint) (*hcn.HostComputeEndpoint, error)
-	createLoadBalancer(loadbalancer *hcn.HostComputeLoadBalancer) (*hcn.HostComputeLoadBalancer, error)
+	GetNetworkByName(networkName string) (*hcn.HostComputeNetwork, error)
+	ListEndpointsOfNetwork(networkId string) ([]hcn.HostComputeEndpoint, error)
+	GetEndpointByID(endpointId string) (*hcn.HostComputeEndpoint, error)
+	ListEndpoints() ([]hcn.HostComputeEndpoint, error)
+	GetEndpointByName(endpointName string) (*hcn.HostComputeEndpoint, error)
+	ListLoadBalancers() ([]hcn.HostComputeLoadBalancer, error)
+	GetLoadBalancerByID(loadBalancerId string) (*hcn.HostComputeLoadBalancer, error)
+	CreateEndpoint(endpoint *hcn.HostComputeEndpoint) (*hcn.HostComputeEndpoint, error)
+	CreateLoadBalancer(loadbalancer *hcn.HostComputeLoadBalancer) (*hcn.HostComputeLoadBalancer, error)
 }
 
 type FakeHCN struct {
@@ -29,15 +29,16 @@ func NewFakeHCN() *FakeHCN {
 	return &FakeHCN{}
 }
 
-func (HCN FakeHCN) getNetworkByName(networkName string) (*hcn.HostComputeNetwork, error) {
+func (HCN FakeHCN) GetNetworkByName(networkName string) (*hcn.HostComputeNetwork, error) {
 	return &hcn.HostComputeNetwork{
 		Id:   guid,
 		Name: networkName,
+		Type: "overlay",
 	}, nil
 
 }
 
-func (HCN FakeHCN) listEndpointsOfNetwork(networkId string) ([]hcn.HostComputeEndpoint, error) {
+func (HCN FakeHCN) ListEndpointsOfNetwork(networkId string) ([]hcn.HostComputeEndpoint, error) {
 	var endpoints []hcn.HostComputeEndpoint
 	for _, ep := range HCN.endpoints {
 		if ep.HostComputeNetwork == networkId {
@@ -47,7 +48,7 @@ func (HCN FakeHCN) listEndpointsOfNetwork(networkId string) ([]hcn.HostComputeEn
 	return endpoints, nil
 }
 
-func (HCN FakeHCN) getEndpointByID(endpointId string) (*hcn.HostComputeEndpoint, error) {
+func (HCN FakeHCN) GetEndpointByID(endpointId string) (*hcn.HostComputeEndpoint, error) {
 	endpoint := &hcn.HostComputeEndpoint{}
 	for _, ep := range HCN.endpoints {
 		if ep.Id == endpointId {
@@ -61,7 +62,7 @@ func (HCN FakeHCN) getEndpointByID(endpointId string) (*hcn.HostComputeEndpoint,
 	return endpoint, nil
 }
 
-func (HCN FakeHCN) listEndpoints() ([]hcn.HostComputeEndpoint, error) {
+func (HCN FakeHCN) ListEndpoints() ([]hcn.HostComputeEndpoint, error) {
 
 	var endpoints []hcn.HostComputeEndpoint
 	for _, ep := range HCN.endpoints {
@@ -70,7 +71,7 @@ func (HCN FakeHCN) listEndpoints() ([]hcn.HostComputeEndpoint, error) {
 	return endpoints, nil
 }
 
-func (HCN FakeHCN) getEndpointByName(endpointName string) (*hcn.HostComputeEndpoint, error) {
+func (HCN FakeHCN) GetEndpointByName(endpointName string) (*hcn.HostComputeEndpoint, error) {
 	endpoint := &hcn.HostComputeEndpoint{}
 	for _, ep := range HCN.endpoints {
 		if ep.Name == endpointName {
@@ -84,7 +85,7 @@ func (HCN FakeHCN) getEndpointByName(endpointName string) (*hcn.HostComputeEndpo
 	return endpoint, nil
 }
 
-func (HCN FakeHCN) listLoadBalancers() ([]hcn.HostComputeLoadBalancer, error) {
+func (HCN FakeHCN) ListLoadBalancers() ([]hcn.HostComputeLoadBalancer, error) {
 	var loadbalancers []hcn.HostComputeLoadBalancer
 	for _, lb := range HCN.loadbalancers {
 		loadbalancers = append(loadbalancers, *lb)
@@ -92,7 +93,7 @@ func (HCN FakeHCN) listLoadBalancers() ([]hcn.HostComputeLoadBalancer, error) {
 	return loadbalancers, nil
 }
 
-func (HCN FakeHCN) getLoadBalancerByID(loadBalancerId string) (*hcn.HostComputeLoadBalancer, error) {
+func (HCN FakeHCN) GetLoadBalancerByID(loadBalancerId string) (*hcn.HostComputeLoadBalancer, error) {
 	loadbalancer := &hcn.HostComputeLoadBalancer{}
 	for _, lb := range HCN.loadbalancers {
 		if lb.Id == loadBalancerId {
@@ -105,14 +106,14 @@ func (HCN FakeHCN) getLoadBalancerByID(loadBalancerId string) (*hcn.HostComputeL
 	return loadbalancer, nil
 }
 
-func (HCN FakeHCN) createEndpoint(endpoint *hcn.HostComputeEndpoint) (*hcn.HostComputeEndpoint, error) {
+func (HCN FakeHCN) CreateEndpoint(endpoint *hcn.HostComputeEndpoint) (*hcn.HostComputeEndpoint, error) {
 	newEndpoint := &hcn.HostComputeEndpoint{
 		Id:                 endpoint.Id,
 		Name:               endpoint.Name,
 		HostComputeNetwork: guid,
 		IpConfigurations:   endpoint.IpConfigurations,
 		MacAddress:         endpoint.MacAddress,
-		Flags:              endpoint.Flags,
+		Flags:              hcn.EndpointFlagsNone,
 		SchemaVersion:      endpoint.SchemaVersion,
 	}
 
@@ -121,7 +122,23 @@ func (HCN FakeHCN) createEndpoint(endpoint *hcn.HostComputeEndpoint) (*hcn.HostC
 	return newEndpoint, nil
 }
 
-func (HCN FakeHCN) createLoadBalancer(loadbalancer *hcn.HostComputeLoadBalancer) (*hcn.HostComputeLoadBalancer, error) {
+func (HCN FakeHCN) CreateRemoteEndpoint(endpoint *hcn.HostComputeEndpoint) (*hcn.HostComputeEndpoint, error) {
+	newEndpoint := &hcn.HostComputeEndpoint{
+		Id:                 endpoint.Id,
+		Name:               endpoint.Name,
+		HostComputeNetwork: guid,
+		IpConfigurations:   endpoint.IpConfigurations,
+		MacAddress:         endpoint.MacAddress,
+		Flags:              hcn.EndpointFlagsRemoteEndpoint | endpoint.Flags,
+		SchemaVersion:      endpoint.SchemaVersion,
+	}
+
+	HCN.endpoints = append(HCN.endpoints, newEndpoint)
+
+	return newEndpoint, nil
+}
+
+func (HCN FakeHCN) CreateLoadBalancer(loadbalancer *hcn.HostComputeLoadBalancer) (*hcn.HostComputeLoadBalancer, error) {
 	newLoadBalancer := &hcn.HostComputeLoadBalancer{
 		Id:                   loadbalancer.Id,
 		HostComputeEndpoints: loadbalancer.HostComputeEndpoints,

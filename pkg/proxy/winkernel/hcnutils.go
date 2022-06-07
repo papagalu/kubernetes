@@ -44,19 +44,21 @@ type HCNUtils interface {
 	deleteLoadBalancer(hnsID string) error
 }
 
-type hcnutils struct{}
+type hcnutils struct {
+	hcn *testing.FakeHCN
+}
 
 var (
 	// LoadBalancerFlagsIPv6 enables IPV6.
 	LoadBalancerFlagsIPv6 hcn.LoadBalancerFlags = 2
 )
 
-func (hcnUtils *hcnutils) InitFakeHcn() *testing.FakeHCN {
-	return testing.NewFakeHCN()
+func (hcnUtils *hcnutils) Init() {
+	hcnUtils.hcn = testing.NewFakeHCN()
 }
 
 func (hns hcnutils) getNetworkByName(name string) (*hnsNetworkInfo, error) {
-	hnsnetwork, err := hcn.GetNetworkByName(name)
+	hnsnetwork, err := hns.hcn.GetNetworkByName(name)
 	if err != nil {
 		klog.ErrorS(err, "Error getting network by name")
 		return nil, err
@@ -89,12 +91,12 @@ func (hns hcnutils) getNetworkByName(name string) (*hnsNetworkInfo, error) {
 }
 
 func (hns hcnutils) getAllEndpointsByNetwork(networkName string) (map[string]*(endpointsInfo), error) {
-	hcnnetwork, err := hcn.GetNetworkByName(networkName)
+	hcnnetwork, err := hns.hcn.GetNetworkByName(networkName)
 	if err != nil {
 		klog.ErrorS(err, "failed to get HNS network by name", "name", networkName)
 		return nil, err
 	}
-	endpoints, err := hcn.ListEndpointsOfNetwork(hcnnetwork.Id)
+	endpoints, err := hns.hcn.ListEndpointsOfNetwork(hcnnetwork.Id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list endpoints: %w", err)
 	}
@@ -121,7 +123,7 @@ func (hns hcnutils) getAllEndpointsByNetwork(networkName string) (map[string]*(e
 }
 
 func (hns hcnutils) getEndpointByID(id string) (*endpointsInfo, error) {
-	hnsendpoint, err := hcn.GetEndpointByID(id)
+	hnsendpoint, err := hns.hcn.GetEndpointByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -134,13 +136,13 @@ func (hns hcnutils) getEndpointByID(id string) (*endpointsInfo, error) {
 	}, nil
 }
 func (hns hcnutils) getEndpointByIpAddress(ip string, networkName string) (*endpointsInfo, error) {
-	hnsnetwork, err := hcn.GetNetworkByName(networkName)
+	hnsnetwork, err := hns.hcn.GetNetworkByName(networkName)
 	if err != nil {
 		klog.ErrorS(err, "Error getting network by name")
 		return nil, err
 	}
 
-	endpoints, err := hcn.ListEndpoints()
+	endpoints, err := hns.hcn.ListEndpoints()
 	if err != nil {
 		return nil, fmt.Errorf("failed to list endpoints: %w", err)
 	}
@@ -166,7 +168,7 @@ func (hns hcnutils) getEndpointByIpAddress(ip string, networkName string) (*endp
 	return nil, fmt.Errorf("Endpoint %v not found on network %s", ip, networkName)
 }
 func (hns hcnutils) getEndpointByName(name string) (*endpointsInfo, error) {
-	hnsendpoint, err := hcn.GetEndpointByName(name)
+	hnsendpoint, err := hns.hcn.GetEndpointByName(name)
 	if err != nil {
 		return nil, err
 	}
@@ -180,10 +182,10 @@ func (hns hcnutils) getEndpointByName(name string) (*endpointsInfo, error) {
 	}, nil
 }
 func (hns hcnutils) createEndpoint(ep *endpointsInfo, networkName string) (*endpointsInfo, error) {
-	hnsNetwork, err := hcn.GetNetworkByName(networkName)
-	if err != nil {
-		return nil, err
-	}
+	// hnsNetwork, err := hns.hcn.GetNetworkByName(networkName)
+	// if err != nil {
+	// 	return nil, err
+	// }
 	var flags hcn.EndpointFlags
 	if !ep.isLocal {
 		flags |= hcn.EndpointFlagsRemoteEndpoint
@@ -202,6 +204,7 @@ func (hns hcnutils) createEndpoint(ep *endpointsInfo, networkName string) (*endp
 	}
 
 	var createdEndpoint *hcn.HostComputeEndpoint
+	var err error
 	if !ep.isLocal {
 		if len(ep.providerAddress) != 0 {
 			policySettings := hcn.ProviderAddressEndpointPolicySetting{
@@ -217,12 +220,12 @@ func (hns hcnutils) createEndpoint(ep *endpointsInfo, networkName string) (*endp
 			}
 			hnsEndpoint.Policies = append(hnsEndpoint.Policies, paPolicy)
 		}
-		createdEndpoint, err = hnsNetwork.CreateRemoteEndpoint(hnsEndpoint)
+		createdEndpoint, err = hns.hcn.CreateRemoteEndpoint(hnsEndpoint)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		createdEndpoint, err = hnsNetwork.CreateEndpoint(hnsEndpoint)
+		createdEndpoint, err = hns.hcn.CreateEndpoint(hnsEndpoint)
 		if err != nil {
 			return nil, err
 		}
@@ -237,7 +240,7 @@ func (hns hcnutils) createEndpoint(ep *endpointsInfo, networkName string) (*endp
 	}, nil
 }
 func (hns hcnutils) deleteEndpoint(hnsID string) error {
-	hnsendpoint, err := hcn.GetEndpointByID(hnsID)
+	hnsendpoint, err := hns.hcn.GetEndpointByID(hnsID)
 	if err != nil {
 		return err
 	}
@@ -249,7 +252,7 @@ func (hns hcnutils) deleteEndpoint(hnsID string) error {
 }
 
 func (hns hcnutils) getAllLoadBalancers() (map[loadBalancerIdentifier]*loadBalancerInfo, error) {
-	lbs, err := hcn.ListLoadBalancers()
+	lbs, err := hns.hcn.ListLoadBalancers()
 	var id loadBalancerIdentifier
 	if err != nil {
 		return nil, err
@@ -338,7 +341,7 @@ func (hns hcnutils) getLoadBalancer(endpoints []endpointsInfo, flags loadBalance
 		loadBalancer.HostComputeEndpoints = append(loadBalancer.HostComputeEndpoints, ep.hnsID)
 	}
 
-	lb, err := loadBalancer.Create()
+	lb, err := hns.hcn.CreateLoadBalancer(loadBalancer)
 
 	if err != nil {
 		return nil, err
@@ -354,7 +357,7 @@ func (hns hcnutils) getLoadBalancer(endpoints []endpointsInfo, flags loadBalance
 }
 
 func (hns hcnutils) deleteLoadBalancer(hnsID string) error {
-	lb, err := hcn.GetLoadBalancerByID(hnsID)
+	lb, err := hns.hcn.GetLoadBalancerByID(hnsID)
 	if err != nil {
 		// Return silently
 		return nil
