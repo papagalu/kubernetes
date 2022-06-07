@@ -73,10 +73,10 @@ func assertHCNDiff(x, y interface{}) string {
 }
 
 func TestGetNetworkByName(t *testing.T) {
-	hns := hns{}
+	hcnutils := hcnutils{}
 	Network := mustTestNetwork(t)
 
-	network, err := hns.getNetworkByName(Network.Name)
+	network, err := hcnutils.getNetworkByName(Network.Name)
 	if err != nil {
 		t.Error(err)
 	}
@@ -101,7 +101,7 @@ func TestGetNetworkByName(t *testing.T) {
 	}
 }
 func TestGetEndpointByID(t *testing.T) {
-	hns := hns{}
+	hcnutils := hcnutils{}
 	Network := mustTestNetwork(t)
 
 	ipConfig := &hcn.IpConfig{
@@ -121,7 +121,7 @@ func TestGetEndpointByID(t *testing.T) {
 		t.Error(err)
 	}
 
-	endpoint, err := hns.getEndpointByID(Endpoint.Id)
+	endpoint, err := hcnutils.getEndpointByID(Endpoint.Id)
 	if err != nil {
 		t.Error(err)
 	}
@@ -149,7 +149,7 @@ func TestGetEndpointByID(t *testing.T) {
 	}
 }
 func TestGetEndpointByIpAddressAndName(t *testing.T) {
-	hns := hns{}
+	hcnutils := hcnutils{}
 	Network := mustTestNetwork(t)
 
 	ipConfig := &hcn.IpConfig{
@@ -169,7 +169,7 @@ func TestGetEndpointByIpAddressAndName(t *testing.T) {
 		t.Error(err)
 	}
 
-	endpoint, err := hns.getEndpointByIpAddress(Endpoint.IpConfigurations[0].IpAddress, Network.Name)
+	endpoint, err := hcnutils.getEndpointByIpAddress(Endpoint.IpConfigurations[0].IpAddress, Network.Name)
 	if err != nil {
 		t.Error(err)
 	}
@@ -180,7 +180,7 @@ func TestGetEndpointByIpAddressAndName(t *testing.T) {
 		t.Errorf("%v does not match %v", endpoint.ip, Endpoint.IpConfigurations[0].IpAddress)
 	}
 
-	endpoint, err = hns.getEndpointByName(Endpoint.Name)
+	endpoint, err = hcnutils.getEndpointByName(Endpoint.Name)
 	if err != nil {
 		t.Error(err)
 	}
@@ -208,7 +208,7 @@ func TestGetEndpointByIpAddressAndName(t *testing.T) {
 	}
 }
 func TestCreateEndpointLocal(t *testing.T) {
-	hns := hns{}
+	hcnutils := hcnutils{}
 	Network := mustTestNetwork(t)
 
 	expectedEndpoint := &hcn.HostComputeEndpoint{
@@ -236,7 +236,7 @@ func TestCreateEndpointLocal(t *testing.T) {
 		isLocal:    true,
 	}
 
-	endpoint, err := hns.createEndpoint(endpoint, Network.Name)
+	endpoint, err := hcnutils.createEndpoint(endpoint, Network.Name)
 	if err != nil {
 		t.Error(err)
 	}
@@ -260,7 +260,7 @@ func TestCreateEndpointLocal(t *testing.T) {
 	}
 }
 func TestCreateEndpointRemote(t *testing.T) {
-	hns := hns{}
+	hcnutils := hcnutils{}
 	Network := mustTestNetwork(t)
 	providerAddress := epPaAddress
 
@@ -296,7 +296,7 @@ func TestCreateEndpointRemote(t *testing.T) {
 		providerAddress: providerAddress,
 	}
 
-	endpoint, err := hns.createEndpoint(endpoint, Network.Name)
+	endpoint, err := hcnutils.createEndpoint(endpoint, Network.Name)
 	if err != nil {
 		t.Error(err)
 	}
@@ -324,7 +324,7 @@ func TestCreateEndpointRemote(t *testing.T) {
 	}
 }
 func TestDeleteEndpoint(t *testing.T) {
-	hns := hns{}
+	hcnutils := hcnutils{}
 	Network := mustTestNetwork(t)
 
 	ipConfig := &hcn.IpConfig{
@@ -342,7 +342,7 @@ func TestDeleteEndpoint(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = hns.deleteEndpoint(Endpoint.Id)
+	err = hcnutils.deleteEndpoint(Endpoint.Id)
 	if err != nil {
 		t.Error(err)
 	}
@@ -359,7 +359,7 @@ func TestDeleteEndpoint(t *testing.T) {
 }
 
 func TestGetLoadBalancerExisting(t *testing.T) {
-	hns := hns{}
+	hcnutils := hcnutils{}
 	Network := mustTestNetwork(t)
 	lbs := make(map[loadBalancerIdentifier]*(loadBalancerInfo))
 
@@ -402,7 +402,7 @@ func TestGetLoadBalancerExisting(t *testing.T) {
 		hnsID: Endpoint.Id,
 	}
 	endpoints := []endpointsInfo{*endpoint}
-	lb, err := hns.getLoadBalancer(endpoints, loadBalancerFlags{}, sourceVip, serviceVip, protocol, internalPort, externalPort, lbs)
+	lb, err := hcnutils.getLoadBalancer(endpoints, loadBalancerFlags{}, sourceVip, serviceVip, protocol, internalPort, externalPort, lbs)
 	if err != nil {
 		t.Error(err)
 	}
@@ -432,7 +432,7 @@ func TestGetLoadBalancerExisting(t *testing.T) {
 	}
 }
 func TestGetLoadBalancerNew(t *testing.T) {
-	hns := hns{}
+	hcnutils := hcnutils{}
 	Network := mustTestNetwork(t)
 	// We keep this empty to ensure we test for new load balancer creation.
 	lbs := make(map[loadBalancerIdentifier]*(loadBalancerInfo))
@@ -457,7 +457,7 @@ func TestGetLoadBalancerNew(t *testing.T) {
 		hnsID: Endpoint.Id,
 	}
 	endpoints := []endpointsInfo{*endpoint}
-	lb, err := hns.getLoadBalancer(endpoints, loadBalancerFlags{}, sourceVip, serviceVip, protocol, internalPort, externalPort, lbs)
+	lb, err := hcnutils.getLoadBalancer(endpoints, loadBalancerFlags{}, sourceVip, serviceVip, protocol, internalPort, externalPort, lbs)
 	if err != nil {
 		t.Error(err)
 	}
@@ -484,7 +484,7 @@ func TestGetLoadBalancerNew(t *testing.T) {
 	}
 }
 func TestDeleteLoadBalancer(t *testing.T) {
-	hns := hns{}
+	hcnutils := hcnutils{}
 	Network := mustTestNetwork(t)
 
 	ipConfig := &hcn.IpConfig{
@@ -517,7 +517,7 @@ func TestDeleteLoadBalancer(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = hns.deleteLoadBalancer(LoadBalancer.Id)
+	err = hcnutils.deleteLoadBalancer(LoadBalancer.Id)
 	if err != nil {
 		t.Error(err)
 	}

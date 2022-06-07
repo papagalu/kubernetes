@@ -124,7 +124,7 @@ type serviceInfo struct {
 	nodePorthnsID          string
 	policyApplied          bool
 	remoteEndpoint         *endpointsInfo
-	hns                    HostNetworkService
+	hns                    HCNUtils
 	preserveDIP            bool
 	localTrafficDSR        bool
 }
@@ -146,11 +146,11 @@ type remoteSubnetInfo struct {
 const NETWORK_TYPE_OVERLAY = "overlay"
 const NETWORK_TYPE_L2BRIDGE = "L2Bridge"
 
-func newHostNetworkService() (HostNetworkService, hcn.SupportedFeatures) {
-	var h HostNetworkService
+func newHostNetworkService() (HCNUtils, hcn.SupportedFeatures) {
+	var h HCNUtils
 	supportedFeatures := hcn.GetSupportedFeatures()
 	if supportedFeatures.Api.V2 {
-		h = hns{}
+		h = hcnutils{}
 	}
 
 	return h, supportedFeatures
@@ -167,7 +167,7 @@ func getNetworkName(hnsNetworkName string) (string, error) {
 	return hnsNetworkName, nil
 }
 
-func getNetworkInfo(hns HostNetworkService, hnsNetworkName string) (*hnsNetworkInfo, error) {
+func getNetworkInfo(hns HCNUtils, hnsNetworkName string) (*hnsNetworkInfo, error) {
 	hnsNetworkInfo, err := hns.getNetworkByName(hnsNetworkName)
 	for err != nil {
 		klog.ErrorS(err, "Unable to find HNS Network specified, please check network name and CNI deployment", "hnsNetworkName", hnsNetworkName)
@@ -233,7 +233,7 @@ type endpointsInfo struct {
 	hnsID           string
 	refCount        *uint16
 	providerAddress string
-	hns             HostNetworkService
+	hns             HCNUtils
 	name            string
 
 	// conditions
@@ -412,7 +412,7 @@ func (proxier *Proxier) newEndpointInfo(baseInfo *proxy.BaseEndpointInfo, _ *pro
 	return info
 }
 
-func newSourceVIP(hns HostNetworkService, network string, ip string, mac string, providerAddress string) (*endpointsInfo, error) {
+func newSourceVIP(hns HCNUtils, network string, ip string, mac string, providerAddress string) (*endpointsInfo, error) {
 	hnsEndpoint := &endpointsInfo{
 		ip:              ip,
 		isLocal:         true,
@@ -552,7 +552,7 @@ type Proxier struct {
 	// precomputing some number of those and cache for future reuse.
 	precomputedProbabilities []string
 
-	hns               HostNetworkService
+	hns               HCNUtils
 	network           hnsNetworkInfo
 	sourceVip         string
 	hostMac           string
