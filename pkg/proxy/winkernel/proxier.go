@@ -141,7 +141,7 @@ func newHostNetworkService() (HCNUtils, hcn.SupportedFeatures) {
 	var h HCNUtils
 	supportedFeatures := hcn.GetSupportedFeatures()
 	if supportedFeatures.Api.V2 {
-		h = hcnutils{}
+		h = hcnutils{&ihcn{}}
 	}
 
 	return h, supportedFeatures

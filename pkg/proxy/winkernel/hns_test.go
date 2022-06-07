@@ -66,6 +66,7 @@ func assertHCNDiff(x, y interface{}) string {
 		nx := x.(hcn.HostComputeNetwork)
 		ny := y.(hcn.HostComputeNetwork)
 		nx.Id = ny.Id
+		nx.Type = ny.Type
 	}
 
 	diff := cmp.Diff(nx, ny)
@@ -80,7 +81,6 @@ func TestGetNetworkByName(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("Network is: %#v", network)
 
 	if !strings.EqualFold(network.id, Network.Id) {
 		t.Errorf("%v does not match %v", network.id, Network.Id)
