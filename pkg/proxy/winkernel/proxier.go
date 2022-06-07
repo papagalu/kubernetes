@@ -72,15 +72,6 @@ func CanUseWinKernelProxier(kcompat KernelCompatTester) (bool, error) {
 
 type WindowsKernelCompatTester struct{}
 
-// IsCompatible returns true if winkernel can support this mode of proxy
-func (lkct WindowsKernelCompatTester) IsCompatible() error {
-	_, err := hcsshim.HNSListPolicyListRequest()
-	if err != nil {
-		return fmt.Errorf("Windows kernel is not compatible for Kernel mode")
-	}
-	return nil
-}
-
 type externalIPInfo struct {
 	ip    string
 	hnsID string
@@ -820,35 +811,6 @@ func (svcInfo *serviceInfo) deleteAllHnsLoadBalancerPolicy() {
 			lbIngressIP.healthCheckHnsID = ""
 		}
 	}
-}
-
-func deleteAllHnsLoadBalancerPolicy() {
-	plists, err := hcsshim.HNSListPolicyListRequest()
-	if err != nil {
-		return
-	}
-	for _, plist := range plists {
-		klog.V(3).InfoS("Remove policy", "policies", plist)
-		_, err = plist.Delete()
-		if err != nil {
-			klog.ErrorS(err, "Failed to delete policy list")
-		}
-	}
-
-}
-
-func getHnsNetworkInfo(hnsNetworkName string) (*hnsNetworkInfo, error) {
-	hnsnetwork, err := hcsshim.GetHNSNetworkByName(hnsNetworkName)
-	if err != nil {
-		klog.ErrorS(err, "Failed to get HNS Network by name")
-		return nil, err
-	}
-
-	return &hnsNetworkInfo{
-		id:          hnsnetwork.Id,
-		name:        hnsnetwork.Name,
-		networkType: hnsnetwork.Type,
-	}, nil
 }
 
 // Sync is called to synchronize the proxier state to hns as soon as possible.
